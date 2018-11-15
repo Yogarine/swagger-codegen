@@ -666,24 +666,24 @@ public class PhpClientCodegen extends DefaultCodegen implements CodegenConfig {
             return "EMPTY";
         }
 
+        String enumName;
         // number
         if ("int".equals(datatype) || "double".equals(datatype) || "float".equals(datatype)) {
-            String varName = name;
-            varName = varName.replaceAll("-", "MINUS_");
-            varName = varName.replaceAll("\\+", "PLUS_");
-            varName = varName.replaceAll("\\.", "_DOT_");
-            return varName;
-        }
+            enumName = name;
+            enumName = enumName.replaceAll("-", "MINUS_");
+            enumName = enumName.replaceAll("\\+", "PLUS_");
+            enumName = enumName.replaceAll("\\.", "_DOT_");
+        } else {
+            // for symbol, e.g. $, #
+            if (getSymbolName(name) != null) {
+                return getSymbolName(name).toUpperCase();
+            }
 
-        // for symbol, e.g. $, #
-        if (getSymbolName(name) != null) {
-            return getSymbolName(name).toUpperCase();
+            // string
+            enumName = sanitizeName(underscore(name).toUpperCase());
+            enumName = enumName.replaceFirst("^_", "");
+            enumName = enumName.replaceFirst("_$", "");
         }
-
-        // string
-        String enumName = sanitizeName(underscore(name).toUpperCase());
-        enumName = enumName.replaceFirst("^_", "");
-        enumName = enumName.replaceFirst("_$", "");
 
         if (isReservedWord(enumName) || enumName.matches("\\d.*")) { // reserved word or starts with number
             return escapeReservedWord(enumName);
